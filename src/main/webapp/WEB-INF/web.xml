@@ -3,8 +3,29 @@
 	<display-name>coinstellation</display-name>
 
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>Catalog.jsp</welcome-file>
 	</welcome-file-list>
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>CatalogServlet</servlet-name>
+		<servlet-class>it.coinstellation.controller.CatalogServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>CartServlet</servlet-name>
+		<servlet-class>it.coinstellation.controller.CartServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CatalogServlet</servlet-name>
+		<url-pattern>/catalog</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>CartServlet</servlet-name>
+		<url-pattern>/cart</url-pattern>
+	</servlet-mapping>
 
 	<!-- Resources -->
 	<resource-ref>
