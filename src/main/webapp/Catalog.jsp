@@ -60,8 +60,8 @@
 						<td><%=p.getNazione()%></td>
 						<td><%=p.getDescrizione()%></td>
 						<td><%=p.getPrezzo()%></td>
-						<td> <a href="cart?action=delete&productID=#{p.getId()}">Delete</a> <br>
-							<a href="cart?action=add&productID=#{p.getId()}">Add</a> <br> </td>
+						<td> <a href="/cart?action=add&productID=#{p.getId()}">Add</a> </td>
+						<td> <a href="/product?productID=#{p.getId()}">Visualizza</a> </td>
 					</tr>
 		<%
 				}

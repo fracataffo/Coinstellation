@@ -14,6 +14,7 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 final class ProdottoDAO_Impl extends AbstractDAO implements ProdottoDAO {
 	
@@ -49,5 +50,39 @@ final class ProdottoDAO_Impl extends AbstractDAO implements ProdottoDAO {
 		}
 		
 		return prodotti;
+	}
+	
+	@Override
+	public Optional<ProdottoDisponibile> queryProdotto(int prodottoID) {
+		if(prodottoID <= 0) {
+			throw new IllegalArgumentException("Il parametro passato non è positivo");
+		}
+		
+		String sql = "SELECT * FROM Prodotti WHERE disponibile = TRUE AND id = ?;";
+		
+		ProdottoDisponibile prodotto = null;
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setInt(1, prodottoID);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()) {
+					prodotto = new ProdottoDisponibile(
+						rs.getInt("id"),
+						rs.getString("nome"),
+						Prodotto.Tipo.valueOf(rs.getString("tipo").toUpperCase()),
+						rs.getLong("valore_nominale"),
+						rs.getString("anno"),
+						rs.getString("nazione"),
+						rs.getString("descrizione"),
+						rs.getBoolean("disponibile"),
+						rs.getLong("prezzo")
+					);
+				}
+			}
+		} catch (SQLException e) {
+			JDBCUtils.printException(e);
+		}
+		
+		return Optional.ofNullable(prodotto);
 	}
 }

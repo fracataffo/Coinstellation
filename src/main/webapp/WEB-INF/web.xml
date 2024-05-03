@@ -16,7 +16,14 @@
 		<servlet-name>CartServlet</servlet-name>
 		<servlet-class>it.coinstellation.controller.CartServlet</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>ProductServlet</servlet-name>
+		<servlet-class>it.coinstellation.controller.ProductServlet</servlet-class>
+	</servlet>
+	
 
+	<!-- Servlets mappings -->
 	<servlet-mapping>
 		<servlet-name>CatalogServlet</servlet-name>
 		<url-pattern>/catalog</url-pattern>
@@ -25,6 +32,11 @@
 	<servlet-mapping>
 		<servlet-name>CartServlet</servlet-name>
 		<url-pattern>/cart</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ProductServlet</servlet-name>
+		<url-pattern>/product</url-pattern>
 	</servlet-mapping>
 
 	<!-- Resources -->
