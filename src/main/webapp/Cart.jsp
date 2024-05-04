@@ -3,22 +3,28 @@
 	pageEncoding="UTF-8"
 
 	language="java"
+	
 	import="it.coinstellation.model.database.Database"
 	import="it.coinstellation.model.entity.ProdottoDisponibile"
 	import="it.coinstellation.model.Carrello"
+	
 	import="java.util.List"
+	import="java.util.Map"
+	import="java.util.Map"
+	
+	import="javax.servlet.http.HttpSession"
 %>
 
-<%! // Estrae il catalogo
-	List<ProdottoDisponibile> catalogo = Database.getInstance()
-											.getProdottoDAO()
-											.queryCatalogo();
-	Carrello carrello = new Carrello();
+<% // Estrae il catalogo
+	final Carrello carrello = (Carrello) session.getAttribute("cart");
+
+	final Map<Integer, Integer> prodottiCarrello = carrello.getProdotti();
+
+	final List<ProdottoDisponibile> catalogo = Database.getInstance()
+														.getProdottoDAO()
+														.queryProdotti(prodottiCarrello.keySet());
 %>
 
-<%
-	session.setAttribute("cart", carrello);
-%>
 
 <!DOCTYPE html>
 <html>
@@ -43,6 +49,7 @@
 			<th>Nazione</th>
 			<th>Descrizione</th>
 			<th>Prezzo</th>
+			<th>Unità</th>
 			<th>Altro</th>
 		</tr>
 
@@ -60,20 +67,23 @@
 						<td><%=p.getNazione()%></td>
 						<td><%=p.getDescrizione()%></td>
 						<td><%=p.getPrezzo()%></td>
-						<td><a href="/cart?action=add&productID=#{p.getId()}">Add</a></td>
+						<td><%=prodottiCarrello.get(p.getId())%></td>
+						<td> 
+							<a href="cart?action=increment&productID=<%=p.getId()%>">Add unit</a> <br>
+							<a href="cart?action=decrement&productID=<%=p.getId()%>">Remove unit</a> <br>
+							<a href="cart?action=remove&productID=<%=p.getId()%>">Remove all</a> 
+						</td>
 					</tr>
 		<%
 				}
 			} 
 			else {
 		%>
-				<tr><td colspan="6">No products available</td></tr>
+				<tr><td colspan="6">Il carrello è vuoto</td></tr>
 		<%
 			}
 		%>
-	</table> <br>
-	
-	<a href="Cart.jsp">Vai al carrello</a> 
+	</table>
 
 </body>
 </html>

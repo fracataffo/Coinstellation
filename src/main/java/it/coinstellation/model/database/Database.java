@@ -24,6 +24,7 @@ public final class Database {
 	private final Connection connection;
 	private ProdottoDAO prodottoDAO = null;
 	private CarrelloDAO carrelloDAO = null;
+	private OrdineDAO ordineDAO = null;
 	
 	private Database() {
 		if (INSTANCE_CREATED) {
@@ -66,5 +67,13 @@ public final class Database {
 		}
 		
 		return carrelloDAO;
+	}
+	
+	public synchronized OrdineDAO getOrdineDAO() {
+		if(ordineDAO == null) {
+			ordineDAO = new OrdineDAO_Impl(connection);
+		}
+		
+		return ordineDAO;
 	}
 }

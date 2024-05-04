@@ -87,10 +87,10 @@ CREATE TABLE Iva (
 
 CREATE TABLE Ordine (
 	`id` INT NOT NULL,
-	`data_ordine` DATETIME DEFAULT CURRENT_TIMESTAMP,
+	`data_ordine` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	`indirizzo_consegna` INT NOT NULL,
 	`data_consegna` DATE NOT NULL,
-	`data_consegnato` DATE,
+	`data_consegnato` TIMESTAMP,
 	`cliente` INT NOT NULL,
 	`costo_spedizione` INT NOT NULL,
 	`costo_complessivo` INT NOT NULL,
