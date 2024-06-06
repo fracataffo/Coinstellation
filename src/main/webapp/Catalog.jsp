@@ -30,49 +30,37 @@
 </head>
 
 <body>
-	<h2>Prodotti</h2>
+	<h2>Catalogo</h2>
+	<section id="main">
+<%
+if (!catalogo.isEmpty()) {
+	for (ProdottoDisponibile p: catalogo) {
+%>
+	<article class="product" id="<%=p.getId()%>">
+		<h3><%=p.getNome()%></h3>
 
-	<table border="1">
-		<tr>
-			<th>Prodotto</th>
-			<th>ID</th>
-			<th>Nome</th>
-			<th>Tipo</th>
-			<th>Valore nominale</th>
-			<th>Anno</th>
-			<th>Nazione</th>
-			<th>Descrizione</th>
-			<th>Prezzo</th>
-			<th>Altro</th>
-		</tr>
-
-		<%
-			if (!catalogo.isEmpty()) {
-				for (ProdottoDisponibile p: catalogo) {
-		%>
-					<tr>
-						<td><img src="immagini/<%=p.getId()%>.jpg"></td>
-						<td><%=p.getId()%></td>
-						<td><%=p.getNome()%></td>
-						<td><%=p.getTipo()%></td>
-						<td><%=p.getValoreNominale()%></td>
-						<td><%=p.getAnno()%></td>
-						<td><%=p.getNazione()%></td>
-						<td><%=p.getDescrizione()%></td>
-						<td><%=p.getPrezzo()%></td>
-						<td><a href="/cart?action=add&productID=#{p.getId()}">Add</a></td>
-					</tr>
-		<%
-				}
-			} 
-			else {
-		%>
-				<tr><td colspan="6">No products available</td></tr>
-		<%
-			}
-		%>
-	</table> <br>
-	
+		<div class="product_info">
+			<ol>
+				<li><span class="prezzo"><b>Prezzo:</b> <%=p.getId()%></span></li>
+				<li><span class="valore_nominale"><b>Valore nominale:</b> <%=p.getValoreNominale()%></span></li>
+				<li><span class="anno"><b>Anno:</b> <%=p.getAnno()%></span></li>
+				<li><span class="nazione"><b>Nazione:</b> <%=p.getNazione()%></span></li>
+				<li>
+					<span class="add_cart"><a href="/cart?action=add&productID=#{p.getId()}">Aggiungi al carrello</a>
+					</span>
+				</li>
+			</ol>
+		</div>
+	</article>
+<%
+	}
+} else {
+%>
+	<div id="empty_catalog">Spiacente, al momento il catalogo è vuoto</div>
+<%
+}
+%>
+	</section>
 	<a href="Cart.jsp">Vai al carrello</a> 
 
 </body>
