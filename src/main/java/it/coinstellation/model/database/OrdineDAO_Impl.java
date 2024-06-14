@@ -1,13 +1,13 @@
 package it.coinstellation.model.database;
 
 import it.coinstellation.model.JDBCUtils;
-
+import it.coinstellation.model.Preconditions;
 import it.coinstellation.model.dao.OrdineDAO;
 import it.coinstellation.model.entity.Ordine;
 import it.coinstellation.model.JDBCUtils;
 
 import java.lang.Integer;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.sql.Connection;
@@ -93,13 +93,15 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 	private void insertProdotti(int ordineID, Map<Integer, Integer> prodotti) {
 		Connection conn = getConnection();
 
-		String sqlQuery1 = "SELECT versione FROM Versione_Prodotto WHERE prodotto = ? AND prezzo = (SELECT prezzo FROM Prodotto WHERE prodotto = ?); ";
-		String sqlQuery2 = "SELECT MAX(versione) FROM Versione_Prodotto WHERE prodotto = ?; ";
+		final String sqlQuery1 = "SELECT versione FROM Versione_Prodotto WHERE prodotto = ? AND "
+				+ "prezzo = (SELECT prezzo FROM Prodotto WHERE prodotto = ?); ";
+		final String sqlQuery2 = "SELECT MAX(versione) FROM Versione_Prodotto WHERE prodotto = ?; ";
 
-		String sqlInsert1 = "INSERT INTO Versione_Prodotto(prodotto, versione, prezzo) VALUES (?, ?, ?); ";
-		String sqlInsert2 = "INSERT INTO Composizione(prodotto, versione, ordine, unita) VALUES (?, ?, ?, ?); ";
+		final String sqlInsert1 = "INSERT INTO Versione_Prodotto(prodotto, versione, prezzo) VALUES (?, ?, ?); ";
 
-		String sqlUpdate = "UPDATE Ordine SET costo_complessivo = costo_spedizione + (SELECT ); ";
+		final String sqlUpdate = "UPDATE Ordine SET costo_complessivo = costo_spedizione + (SELECT ); ";
+
+		final Map<Integer, ProductData> orderedProducts = new HashMap<>();
 
 		for (Map.Entry<Integer, Integer> entry: prodotti.entrySet()) {
 			int prodottoID = entry.getKey();
@@ -113,11 +115,11 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 				stmtQuery1.setInt(2, prodottoID);
 
 				try (ResultSet rs1 = stmtQuery1.executeQuery()) {
-					if (rs1.next()) { // Esiste una versione del prodotto con il prezzo corrente.
+					if (rs1.next()) { // Caso 1 - Esiste una versione del prodotto con il prezzo corrente.
 						versione = rs1.getInt("versione");
 					} else {
 						try (ResultSet rs2 = stmtQuery2.executeQuery()) {
-							if (rs2.next()) { // Esiste una versione del prodotto ma con prezzo differente.
+							if (rs2.next()) { // Caso 2 - Esiste una versione del prodotto ma con prezzo differente.
 								versione = rs2.getInt("versione") + 1;
 							}
 						}
@@ -136,23 +138,62 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 				JDBCUtils.printException(e);
 			}
 
-			/* Step 2: Associazione della versione corrente di ciascun prodotto con l'ordine */
-			// FIXME: Inserire in batch le tuple nella relazione Composizione 
-			try (PreparedStatement stmtInsert2 = conn.prepareStatement(sqlInsert2)) {
-				stmtInsert2.setInt(1, prodottoID);
-				stmtInsert2.setInt(2, versione);
-				stmtInsert2.setInt(3, ordineID);
-				stmtInsert2.setInt(4, unita);
-
-				stmtInsert2.executeUpdate();
-			}
+			orderedProducts.put(prodottoID, new ProductData(versione, unita));
 		}
 
-		/* Step 3: Aggiornamento del costo complessivo dell'ordine */
-		try (PreparedStatement stmtInsert2 = conn.prepareStatement(sqlInsert2)) {
-				stmtInsert2.setInt(1, ordineID);
+		/* Step 2: Associazione della versione corrente di ciascun prodotto con l'ordine */
+		insertOrderProducts(ordineID, orderedProducts);
 
-				stmtInsert2.executeUpdate();
+		/* Step 3: Aggiornamento del costo complessivo dell'ordine */
+		try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+				stmtUpdate.setInt(1, ordineID);
+
+				stmtUpdate.executeUpdate();
+		} catch (SQLException e) {
+			JDBCUtils.printException(e);
+		}
+	}
+
+	/* Inserisce le tuple nella tabella `Composizione` */
+	private void insertOrderProducts(int orderID, Map<Integer, ProductData> orderProducts) {
+		Connection conn = getConnection();
+
+		final String sqlInsert = "INSERT INTO Composizione(ordine, prodotto, versione, unita) VALUES (?, ?, ?, ?); ";
+
+		try (PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert)) {
+			for (Map.Entry<Integer, ProductData> entry : orderProducts.entrySet()) {
+				Integer productID = entry.getKey();
+				ProductData productData = entry.getValue();
+
+				stmtInsert.setInt(1, orderID);
+				stmtInsert.setInt(2, productID);
+				stmtInsert.setInt(3, productData.getVersione());
+				stmtInsert.setInt(4, productData.getUnita());
+
+				stmtInsert.addBatch();
+			}
+
+			stmtInsert.executeBatch();
+		} catch (SQLException e) {
+			JDBCUtils.printException(e);
+		}
+	}
+
+	private static final class ProductData {
+		private final int versione;
+		private final int unita;
+
+		public ProductData(int versione, int unita) {
+			this.versione = versione;
+			this.unita = unita;
+		}
+
+		public int getVersione() {
+			return versione;
+		}
+
+		public int getUnita() {
+			return unita;
 		}
 	}
 
