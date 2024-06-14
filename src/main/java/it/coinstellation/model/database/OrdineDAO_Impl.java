@@ -22,7 +22,7 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 	public OrdineDAO_Impl(Connection connection) {
 		super(connection);
 	}
-	
+
 	@Override
 	public synchronized void insertOrdine(Ordine ordine, Map<Integer, Integer> prodotti) {
 		Objects.requireNonNull(ordine);
@@ -76,7 +76,7 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 		}
 	}
 
-	private void insertOrdine(Ordine ordine) {
+	private void insertOrdine(Ordine ordine) throws SQLException {
 		String sql = "INSERT INTO Ordine(data_consegna, data_consegnato, costo_spedizione, " +
 						"costo_complessivo, indirizzo_consegna, cliente, iva, metodo_pagamento) " +
 						"VALUES (?, ?, ?, ?, ?, ?, ?, ?); ";
@@ -92,12 +92,10 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 			stmt.setInt(8, 1);
 			
 			stmt.executeUpdate();
-		} catch (SQLException e) {
-			JDBCUtils.printException(e);
 		}
 	}
 
-	private void insertProdotti(int ordineID, Map<Integer, Integer> prodotti) {
+	private void insertProdotti(int ordineID, Map<Integer, Integer> prodotti) throws SQLException {
 		Connection conn = getConnection();
 
 		final String sqlQuery1 = "SELECT versione FROM Versione_Prodotto WHERE prodotto = ? AND "
@@ -146,8 +144,6 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 						}
 					}
 				}
-			} catch (SQLException e) {
-				JDBCUtils.printException(e);
 			}
 
 			orderedProducts.put(prodottoID, new ProductData(versione, unita));
@@ -161,13 +157,11 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 				stmtUpdate.setInt(1, ordineID);
 
 				stmtUpdate.executeUpdate();
-		} catch (SQLException e) {
-			JDBCUtils.printException(e);
 		}
 	}
 
 	/* Inserisce le tuple nella tabella `Composizione` */
-	private void insertOrderProducts(int orderID, Map<Integer, ProductData> orderProducts) {
+	private void insertOrderProducts(int orderID, Map<Integer, ProductData> orderProducts) throws SQLException {
 		Connection conn = getConnection();
 
 		final String sqlInsert = "INSERT INTO Composizione(ordine, prodotto, versione, unita) VALUES (?, ?, ?, ?); ";
@@ -186,8 +180,6 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 			}
 
 			stmtInsert.executeBatch();
-		} catch (SQLException e) {
-			JDBCUtils.printException(e);
 		}
 	}
 
