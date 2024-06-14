@@ -3,14 +3,15 @@ package it.coinstellation.model.database;
 import it.coinstellation.model.JDBCUtils;
 
 import it.coinstellation.model.dao.OrdineDAO;
-
+import it.coinstellation.model.entity.Ordine;
 import it.coinstellation.model.JDBCUtils;
 
 import java.lang.Integer;
 
 import java.util.Map;
-
+import java.util.Objects;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -73,11 +74,11 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 						"costo_complessivo, indirizzo_consegna, cliente, iva, metodo_pagamento) " +
 						"VALUES (?, ?, ?, ?, ?, ?, ?, ?); ";
 		
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setDate(1, Date.valueOf(ordine.getDataConsegna());
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setDate(1, Date.valueOf(ordine.getDataConsegna()));
 			stmt.setNull(2, Types.TIMESTAMP);
-			stmt.setInt(3, ordine.getCostoSpedizione());
-			stmt.setInt(4, 0L);
+			stmt.setLong(3, ordine.getCostoSpedizione());
+			stmt.setLong(4, 0L);
 			stmt.setInt(5, 1);
 			stmt.setInt(6, 1);
 			stmt.setInt(7, 1);
@@ -112,11 +113,11 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 				stmtQuery1.setInt(2, prodottoID);
 
 				try (ResultSet rs1 = stmtQuery1.executeQuery()) {
-					if (rs.next()) { // Esiste una versione del prodotto con il prezzo corrente.
+					if (rs1.next()) { // Esiste una versione del prodotto con il prezzo corrente.
 						versione = rs1.getInt("versione");
 					} else {
 						try (ResultSet rs2 = stmtQuery2.executeQuery()) {
-							if (rs.next()) { // Esiste una versione del prodotto ma con prezzo differente.
+							if (rs2.next()) { // Esiste una versione del prodotto ma con prezzo differente.
 								versione = rs2.getInt("versione") + 1;
 							}
 						}
@@ -138,20 +139,20 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 			/* Step 2: Associazione della versione corrente di ciascun prodotto con l'ordine */
 			// FIXME: Inserire in batch le tuple nella relazione Composizione 
 			try (PreparedStatement stmtInsert2 = conn.prepareStatement(sqlInsert2)) {
-				stmtInsert1.setInt(1, prodottoID);
-				stmtInsert1.setInt(2, versione);
-				stmtInsert1.setInt(3, ordineID);
-				stmtInsert1.setInt(4, unita);
+				stmtInsert2.setInt(1, prodottoID);
+				stmtInsert2.setInt(2, versione);
+				stmtInsert2.setInt(3, ordineID);
+				stmtInsert2.setInt(4, unita);
 
-				stmtInsert1.executeUpdate();
+				stmtInsert2.executeUpdate();
 			}
 		}
 
 		/* Step 3: Aggiornamento del costo complessivo dell'ordine */
 		try (PreparedStatement stmtInsert2 = conn.prepareStatement(sqlInsert2)) {
-				stmtInsert1.setInt(1, ordineID);
+				stmtInsert2.setInt(1, ordineID);
 
-				stmtInsert1.executeUpdate();
+				stmtInsert2.executeUpdate();
 		}
 	}
 

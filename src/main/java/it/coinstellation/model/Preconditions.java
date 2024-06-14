@@ -14,8 +14,24 @@ public final class Preconditions {
 
 		return value;
 	}
-	
+
+	public static long checkPositive(long value, String paramName) {
+		if (value <= 0) {
+			throw new IllegalArgumentException("Il valore del parametro "+paramName+" non è positivo (valore attuale = "+value);
+		}
+
+		return value;
+	}
+
 	public static int checkNonNegative(int value, String paramName) {
+		if (value < 0) {
+			throw new IllegalArgumentException("Il valore del parametro "+paramName+" è negativo (valore attuale = "+value);
+		}
+
+		return value;
+	}
+
+	public static long checkNonNegative(long value, String paramName) {
 		if (value < 0) {
 			throw new IllegalArgumentException("Il valore del parametro "+paramName+" è negativo (valore attuale = "+value);
 		}

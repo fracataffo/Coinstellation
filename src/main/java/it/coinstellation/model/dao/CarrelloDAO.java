@@ -1,9 +1,5 @@
 package it.coinstellation.model.dao;
 
-import it.coinstellation.model.entity.ProdottoDisponibile;
-
-import java.util.List;
-
 public interface CarrelloDAO {
 
 	/** Operazioni di Aggiornamento **/

@@ -2,10 +2,8 @@ package it.coinstellation.model.entity;
 
 import it.coinstellation.model.Preconditions;
 
-import java.lang.String;
-
 import java.time.Instant;
-import java.tine.LocalDate;
+import java.time.LocalDate;
 
 import java.util.Objects;
 
@@ -25,18 +23,18 @@ public final class Ordine {
 	 *	@throws IllegalArgumentException se qualche parametro intero non è positivo oppure se {@code costoSpedizione} è negativo
 	 *	@throws NullPointerException se almeno uno tra {@code dataOrdine} e {@code dataConsegna} è {@code null}
 	 */
-	public Ordine(int id, Instant dataOrdine, LocalDate dataConsegna, Istant dataConsegnato, 
+	public Ordine(int id, Instant dataOrdine, LocalDate dataConsegna, Instant dataConsegnato, 
 		long costoSpedizione, long costoComplessivo, int ivaID, int clienteID, int metodoPagamentoID, int indirizzoConsegnaID) {
-		this.id = Preconditions.checkPositive(id);
+		this.id = Preconditions.checkPositive(id, "id");
 		this.dataOrdine = Objects.requireNonNull(dataOrdine);
 		this.dataConsegna = Objects.requireNonNull(dataConsegna);
 		this.dataConsegnato = dataConsegnato;
-		this.costoSpedizione = Preconditions.checkNonNegative(costoSpedizione);
-		this.costoComplessivo = Preconditions.checkPositive(costoComplessivo);
-		this.ivaID = Preconditions.checkPositive(ivaID);
-		this.clienteID = Preconditions.checkPositive(clienteID);
-		this.metodoPagamentoID = Preconditions.checkPositive(metodoPagamentoID);
-		this.indirizzoConsegnaID = Preconditions.checkPositive(indirizzoConsegnaID);
+		this.costoSpedizione = Preconditions.checkNonNegative(costoSpedizione, "costoSpedizione");
+		this.costoComplessivo = Preconditions.checkPositive(costoComplessivo, "costoComplessivo");
+		this.ivaID = Preconditions.checkPositive(ivaID, "ivaID");
+		this.clienteID = Preconditions.checkPositive(clienteID, "clienteID");
+		this.metodoPagamentoID = Preconditions.checkPositive(metodoPagamentoID, "metodoPagamentoID");
+		this.indirizzoConsegnaID = Preconditions.checkPositive(indirizzoConsegnaID, "indirizzoConsegnaID");
 	}
 
 	public int getID() {
@@ -69,7 +67,7 @@ public final class Ordine {
 
 	public int getClienteID() {
 		return clienteID;
-	]
+	}
 
 	public int getMetodoPagamentoID() {
 		return metodoPagamentoID;

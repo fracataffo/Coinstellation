@@ -1,6 +1,7 @@
 package it.coinstellation.model.database;
 
 import it.coinstellation.model.dao.CarrelloDAO;
+import it.coinstellation.model.dao.OrdineDAO;
 import it.coinstellation.model.dao.ProdottoDAO;
 
 import java.sql.Connection;
