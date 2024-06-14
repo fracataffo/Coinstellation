@@ -104,7 +104,8 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 				+ "prezzo = (SELECT prezzo FROM Prodotto WHERE prodotto = ?); ";
 		final String sqlQuery2 = "SELECT MAX(versione) FROM Versione_Prodotto WHERE prodotto = ?; ";
 
-		final String sqlInsert1 = "INSERT INTO Versione_Prodotto(prodotto, versione, prezzo) VALUES (?, ?, ?); ";
+		final String sqlInsert1 = "INSERT INTO Versione_Prodotto(prodotto, versione, prezzo) SELECT "
+				+ "?, ?, prezzo FROM Prodotto WHERE id = ?; ";
 
 		final String sqlUpdate = "UPDATE Ordine SET costo_complessivo = costo_spedizione + (SELECT ); ";
 
@@ -135,7 +136,7 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 						try (PreparedStatement stmtInsert1 = conn.prepareStatement(sqlInsert1)) {
 							stmtInsert1.setInt(1, prodottoID);
 							stmtInsert1.setInt(2, versione);
-							stmtInsert1.setInt(3, prezzo);
+							stmtInsert1.setInt(3,  prodottoID);
 							
 							stmtInsert1.executeUpdate();
 						}
