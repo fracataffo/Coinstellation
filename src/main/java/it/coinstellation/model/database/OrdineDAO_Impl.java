@@ -107,7 +107,11 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 		final String sqlInsert1 = "INSERT INTO Versione_Prodotto(prodotto, versione, prezzo) SELECT "
 				+ "?, ?, prezzo FROM Prodotto WHERE id = ?; ";
 
-		final String sqlUpdate = "UPDATE Ordine SET costo_complessivo = costo_spedizione + (SELECT ); ";
+		final String sqlUpdate = "UPDATE Ordine SET costo_complessivo = costo_spedizione + ("
+				+ "	SELECT SUM(prezzo * unita)"
+				+ "	FROM Versione_Prodotto JOIN Composizione USING (prodotto, versione)"
+				+ "	WHERE ordine = ?"
+				+ "); ";
 
 		final Map<Integer, ProductData> orderedProducts = new HashMap<>();
 
