@@ -67,6 +67,13 @@ final class OrdineDAO_Impl extends AbstractDAO implements OrdineDAO {
 		}
 		
 		// TODO: Controllare i valori.
+		for (Map.Entry<Integer, Integer> entry : prodotti.entrySet()) {
+			Integer prodottoID = entry.getKey();
+			Integer unita = entry.getValue();
+
+			Preconditions.checkPositive(prodottoID, "prodottoID");
+			Preconditions.checkPositive(unita, "unita");
+		}
 	}
 
 	private void insertOrdine(Ordine ordine) {
