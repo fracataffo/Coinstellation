@@ -36,7 +36,6 @@ CREATE TABLE Indirizzo (
 CREATE TABLE Cliente_Indirizzo (
 	`cliente` INT NOT NULL,
 	`indirizzo` INT NOT NULL,
-	`password` VARCHAR(80) NOT NULL,
 	PRIMARY KEY (`cliente`, `indirizzo`),
 	CONSTRAINT `fk_cliente_indirizzo_1`
 		FOREIGN KEY (`cliente`)
